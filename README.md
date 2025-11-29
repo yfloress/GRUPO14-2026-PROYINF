@@ -34,25 +34,30 @@ Este proyecto usa los siguientes stack de desarrollo:
 * [Node.js](https://nodejs.org/) (opcional, solo para desarrollo local)
 * `curl` o cliente HTTP (para probar endpoints)
 #### Clonar el repositorio
+```bash
 git clone [https://github.com/AlvaroTuno/GRUPO02-2025-PROYINF](https://github.com/AlvaroTuno/GRUPO02-2025-PROYINF)
+```
 
 (debe tener docker-desktop abierto en todo momento)
 
 Ejecutar en terminal:
 
-1. Deben navegar hasta la carpeta GRUPO02-2025-PROYINF/mi-proyecto-node-docker2  
+1. Deben navegar hasta la carpeta `GRUPO02-2025-PROYINF/mi-proyecto-node-docker2`
 
 2. (les instalará las dependencias se suele demorar un poco la primera vez con esto levantan el proyecto)  
+```bash
 docker compose up --build
+```
 
 (para detener los contenedores)
+```bash
+docker compose down -v
+```
 
-`docker compose down -v`
-
-y si no funciona el anterior pueden usar `Ctrl+C.`
+y si no funciona el anterior pueden usar `Ctrl+C`.
 
 si no les ejecuta asegurense de estar en la carpeta correcta  
-si trabajan desde windows deben tener instalado WSL2 y tenerlo activado en docker desktop  
+si trabajan desde Windows deben tener instalado WSL2 y tenerlo activado en docker desktop  
 esto se puede verificar en  
 
 Por ultimo adentro de la carpeta del proyecto esta un readme explicando todas las funcionalidades y como crear las tablas para la base de datos
