@@ -88,7 +88,7 @@ psql -U postgres
 ```
 
 Ahora estaremos en la terminal del psql. Crearemos la BD y accederemos a la base de datos llamado "prestamos"
-```sql
+```psql
 CREATE DATABASE prestamos_db;
 \c prestamos_db;
 ```
