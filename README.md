@@ -15,7 +15,7 @@ Puede acceder a la Wiki mediante el siguiente [enlace](https://github.com/Alvaro
 * [Video presentación cliente (Esta alojado en Aula)](https://aula.usm.cl/mod/resource/view.php?id=6926137)
 * [Video de avances del proyecto (Hito 3)](https://youtu.be/zVKJSRhsQBA)
 * [Segunda Reunión con el cliente 05-11-2025](https://drive.google.com/file/d/1X_r8pDOMemV8-iPtcfFoTjsE5H_7BTZU/view)
-* [Video de resultado final del sistema implementado (Hito 5)](https://youtu.be/OdlQ_D9dkLI)
+* [Video de resultado final del sistema implementado (Hito 5)](https://youtu.be/Z70Jahmeq90)
 
 
 ## Aspectos técnicos relevantes
