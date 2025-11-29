@@ -9,12 +9,11 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // 🟦 LOGIN CLIENTES
+  const loginCliente = async () => {
     setError("");
 
     try {
-      // Llamar a tu backend
       const res = await fetch("http://localhost:3000/api/usuarios/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -22,15 +21,42 @@ export default function Login() {
       });
 
       const data = await res.json();
-      console.log("Respuesta del backend:", data);
       if (!res.ok) throw new Error(data.error || "Error al iniciar sesión");
 
-      // Autenticación exitosa → guarda usuario en contexto
-      login(rut, password);
-      navigate("/"); // Redirigir al Home
+      // 👉 Guardar en contexto como CLIENTE
+      login(rut, "cliente");
+      navigate("/");
     } catch (err) {
       setError(err.message);
     }
+  };
+
+  // 🟥 LOGIN ADMIN
+  const loginAdmin = async () => {
+    setError("");
+
+    try {
+      const res = await fetch("http://localhost:3000/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rut, clave: password }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Error al iniciar sesión como admin");
+
+      // 👉 Guardar en contexto como ADMIN
+      login(rut, "admin");
+      navigate("/admin");
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  // 🟧 Cuando se presiona el botón normal (cliente)
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    loginCliente();
   };
 
   return (
@@ -52,6 +78,7 @@ export default function Login() {
               required
             />
           </div>
+
           <div className="mb-3">
             <label className="form-label fw-semibold">Clave</label>
             <input
@@ -63,12 +90,43 @@ export default function Login() {
               required
             />
           </div>
+
+          {/* 🔵 LOGIN CLIENTE */}
           <button type="submit" className="btn btn-primary w-100">
             Iniciar Sesión
           </button>
+
+          {/* 🔹 EXTRA BUTTONS */}
+          <div className="d-flex flex-column gap-2 mt-3">
+            <div className="d-flex gap-2">
+              <button
+                type="button"
+                className="btn btn-outline-primary w-50"
+                onClick={() => navigate("/evaluacion-riesgo")}
+              >
+                Simulación
+              </button>
+
+              <button
+                type="button"
+                className="btn btn-outline-secondary w-50"
+                onClick={() => navigate("/faq")}
+              >
+                FAQ
+              </button>
+            </div>
+
+            {/* 🔴 LOGIN ADMIN */}
+            <button
+              type="button"
+              className="btn btn-outline-dark w-100"
+              onClick={loginAdmin}
+            >
+              Administrador
+            </button>
+          </div>
         </form>
 
-        {/* 🔹 Nuevo: enlace hacia registro */}
         <button
           className="btn btn-link mt-3 text-secondary"
           onClick={() => navigate("/register")}

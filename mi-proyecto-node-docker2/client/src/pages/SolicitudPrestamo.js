@@ -1,16 +1,38 @@
+// client/src/pages/SolicitudPrestamo.js
 import { useState } from "react";
-import { useAuth } from "../context/AuthContext"; // 👈 importar
+import { useAuth } from "../context/AuthContext";
 
 export default function SolicitudPrestamo() {
-  const { user } = useAuth(); // 👈 obtener usuario logueado
+  const { user } = useAuth(); 
   const [monto, setMonto] = useState(0);
   const [cuotas, setCuotas] = useState(2);
   const [loading, setLoading] = useState(false);
 
-  const interesFijo = 0.0095; // 0.95% mensual fijo
+  const [historial, setHistorial] = useState([]);
+
+  const interesFijo = 0.0095;
 
   const interesTotal = monto * interesFijo;
   const cuotaMensual = cuotas > 0 ? (monto + interesTotal) / cuotas : 0;
+
+  const guardarSimulacion = () => {
+    if (monto <= 0 || cuotas <= 0) {
+      alert("Debe ingresar valores válidos.");
+      return;
+    }
+
+    const nuevaSimulacion = {
+      id: Date.now(),
+      monto,
+      cuotas,
+      interes: Math.round(interesTotal),
+      cuotaMensual: Math.round(cuotaMensual),
+    };
+
+    setHistorial((prev) => [...prev, nuevaSimulacion]);
+    alert("Simulación guardada en el historial.");
+  };
+
 
   const handleSolicitud = async () => {
     if (monto <= 0 || cuotas <= 0) {
@@ -24,9 +46,10 @@ export default function SolicitudPrestamo() {
     }
 
     setLoading(true);
+
     try {
       const data = {
-        rut_cliente: user.rut, // 👈 enviamos rut del usuario logueado
+        rut_cliente: user.rut,
         monto,
         cuotas,
         interesTotal,
@@ -47,17 +70,39 @@ export default function SolicitudPrestamo() {
 
       const { prestamo, cuotas: cuotasGeneradas } = result.data || {};
 
-      alert(
-        `✅ Préstamo registrado correctamente.\n\n` +
-          `RUT cliente: ${prestamo?.rut_cliente}\n` +
-          `Monto: $${Math.round(prestamo?.monto || monto).toLocaleString("es-CL")}\n` +
-          `Cuotas generadas: ${cuotasGeneradas?.length || cuotas}\n` +
-          `Primera vence: ${cuotasGeneradas?.[0]?.fecha_vencimiento || "—"}`
-      );
 
-      console.log("📦 Resultado completo:", result);
+      let correoSeg = null;
+      try {
+        const userRes = await fetch(
+          `http://localhost:3000/api/usuarios/${encodeURIComponent(user.rut)}`
+        );
+        if (userRes.ok) {
+          const userData = await userRes.json();
+          correoSeg = userData?.user?.correo_seguridad || null;
+        }
+      } catch (e) {
+        console.error("Error consultando correo de seguridad:", e);
+      }
+
+
+      let mensaje =
+        "✅ Préstamo registrado correctamente.\n\n" +
+        `RUT cliente: ${prestamo?.rut_cliente}\n` +
+        `Monto: $${Math.round(prestamo?.monto || monto).toLocaleString("es-CL")}\n` +
+        `Cuotas generadas: ${cuotasGeneradas?.length || cuotas}\n` +
+        `Primera vence: ${
+          cuotasGeneradas?.[0]?.fecha_vencimiento || "--"
+        }`;
+
+      if (correoSeg) {
+        mensaje += `\n\n📧 El comprobante ha sido enviado al correo de seguridad: ${correoSeg}`;
+      }
+
+      alert(mensaje);
+
+      console.log("Resultado completo:", result);
     } catch (error) {
-      console.error("❌ Error en la solicitud:", error);
+      console.error("❌ Error:", error);
       alert("Ocurrió un error al registrar el préstamo. Intenta nuevamente.");
     } finally {
       setLoading(false);
@@ -89,6 +134,7 @@ export default function SolicitudPrestamo() {
         <label style={{ display: "block", marginBottom: "10px" }}>
           Número de cuotas:
         </label>
+
         <select
           value={cuotas}
           onChange={(e) => setCuotas(Number(e.target.value))}
@@ -124,9 +170,26 @@ export default function SolicitudPrestamo() {
         <p>N° de cuotas: {cuotas}</p>
         <p>Interés a pagar: ${Math.round(interesTotal).toLocaleString("es-CL")}</p>
         <p>Cuota mensual: ${Math.round(cuotaMensual).toLocaleString("es-CL")}</p>
+
+        {/* Botón: Guardar simulación */}
+        <button
+          onClick={guardarSimulacion}
+          style={{
+            marginTop: "20px",
+            padding: "8px 20px",
+            fontSize: "16px",
+            backgroundColor: "#28a745",
+            color: "white",
+            border: "none",
+            borderRadius: "8px",
+            cursor: "pointer",
+          }}
+        >
+          Guardar simulación
+        </button>
       </div>
 
-      {/* Botón */}
+      {/* Botón solicitar */}
       <button
         onClick={handleSolicitud}
         style={{
@@ -143,6 +206,99 @@ export default function SolicitudPrestamo() {
       >
         {loading ? "Enviando..." : "Solicitar"}
       </button>
+
+      {historial.length > 0 && (
+        <div style={{ marginTop: "50px" }}>
+          <h2>Historial de Simulaciones</h2>
+
+          <table
+            style={{
+              width: "80%",
+              margin: "20px auto",
+              borderCollapse: "collapse",
+              textAlign: "center",
+            }}
+          >
+            <thead>
+              <tr style={{ backgroundColor: "#f0f0f0" }}>
+                <th style={{ padding: "10px", border: "1px solid #ccc" }}>
+                  Monto
+                </th>
+                <th style={{ padding: "10px", border: "1px solid #ccc" }}>
+                  Cuotas
+                </th>
+                <th style={{ padding: "10px", border: "1px solid #ccc" }}>
+                  Interés
+                </th>
+                <th style={{ padding: "10px", border: "1px solid #ccc" }}>
+                  Cuota Mensual
+                </th>
+                <th style={{ padding: "10px", border: "1px solid #ccc" }}>
+                  Acciones
+                </th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {historial.map((sim) => (
+                <tr key={sim.id}>
+                  <td style={{ padding: "8px", border: "1px solid #ccc" }}>
+                    ${sim.monto.toLocaleString("es-CL")}
+                  </td>
+                  <td style={{ padding: "8px", border: "1px solid #ccc" }}>
+                    {sim.cuotas}
+                  </td>
+                  <td style={{ padding: "8px", border: "1px solid #ccc" }}>
+                    ${sim.interes.toLocaleString("es-CL")}
+                  </td>
+                  <td style={{ padding: "8px", border: "1px solid #ccc" }}>
+                    ${sim.cuotaMensual.toLocaleString("es-CL")}
+                  </td>
+
+                  <td style={{ padding: "8px", border: "1px solid #ccc" }}>
+                    <button
+                      onClick={() => {
+                        setMonto(sim.monto);
+                        setCuotas(sim.cuotas);
+                        alert("Simulación cargada en el formulario.");
+                      }}
+                      style={{
+                        background: "#17a2b8",
+                        color: "white",
+                        border: "none",
+                        padding: "5px 10px",
+                        marginRight: "5px",
+                        borderRadius: "6px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Usar esta simulación
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        setHistorial((hist) =>
+                          hist.filter((h) => h.id !== sim.id)
+                        )
+                      }
+                      style={{
+                        background: "red",
+                        color: "white",
+                        border: "none",
+                        padding: "5px 10px",
+                        borderRadius: "6px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Borrar
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

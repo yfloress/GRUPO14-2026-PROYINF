@@ -8,6 +8,9 @@ import Footer from "./components/Footer";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./ProtectedRoute";
 
+import GestorSolicitudes from "./pages/GestorSolicitudes";
+import FAQ from "./pages/FAQ";
+
 // Páginas base
 import Home from "./pages/Home";
 import About from "./pages/About";
@@ -15,6 +18,10 @@ import Contact from "./pages/Contact";
 import Messages from "./pages/Messages";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import SeguridadCuenta from "./pages/SeguridadCuenta";
+import AdminPanel from "./pages/AdminPanel";
+import AdminScoringModular from "./pages/AdminScoringModular";
+import CompararScorings from "./pages/CompararScorings";
 
 // Módulos del sistema de préstamos
 import SolicitudPrestamo from "./pages/SolicitudPrestamo";
@@ -148,7 +155,43 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/gestor-solicitudes"
+              element={
+                <ProtectedRoute>
+                  <GestorSolicitudes />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/faq"
+              element={
+                <ProtectedRoute>
+                  <FAQ />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* 🔐 Seguridad de cuenta (SIN ProtectedRoute) */}
+            <Route path="/seguridad" element={<SeguridadCuenta />} />
+            {/* Soportamos también /seguridad-cuenta por si algún botón apunta ahí */}
+            <Route path="/seguridad-cuenta" element={<SeguridadCuenta />} />
+
+            {/* Admin */}
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <AdminPanel />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/admin/scoring-modular" element={<AdminScoringModular />} />
+            <Route path="/comparar-scorings" element={<CompararScorings />} />
+
             <Route path="/register" element={<Register />} />
+
             {/* Ruta por defecto */}
             <Route path="*" element={<Login />} />
           </Routes>

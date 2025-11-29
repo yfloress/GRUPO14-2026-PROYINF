@@ -10,6 +10,12 @@ export default function Home() {
     { label: "Gestión de Pagos", route: "/gestion-pagos", icon: "bi bi-credit-card" },
     { label: "Evaluación de Riesgo", route: "/evaluacion-riesgo", icon: "bi bi-shield-check" },
     { label: "Préstamo Pre-Aprobado", route: "/prestamo-preaprobado", icon: "bi bi-hand-thumbs-up" },
+    { label: "Gestor de Solicitudes", route: "/gestor-solicitudes", icon: "bi bi-folder2-open" },
+    { label: "Preguntas Frecuentes", route: "/faq", icon: "bi bi-question-circle" },
+    { label: "Seguridad", route: "/seguridad-cuenta", icon: "bi bi-shield-lock" },
+    { label: "Comparar Scorings", route: "/comparar-scorings", icon: "bi bi-graph-up-arrow" },
+
+
   ];
 
   return (
