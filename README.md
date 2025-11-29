@@ -35,7 +35,7 @@ Este proyecto usa los siguientes stack de desarrollo:
 * `curl` o cliente HTTP (para probar endpoints)
 #### Clonar el repositorio
 ```bash
-git clone [https://github.com/AlvaroTuno/GRUPO02-2025-PROYINF](https://github.com/AlvaroTuno/GRUPO02-2025-PROYINF)
+git clone https://github.com/AlvaroTuno/GRUPO02-2025-PROYINF
 ```
 
 (debe tener docker-desktop abierto en todo momento)
