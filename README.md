@@ -1,4 +1,4 @@
-# GRUPO02-2025-PROYINF
+# GRUPO14-2026-PROYINF
 
 | Nombre          | Nickname     | Rol              |
 | --------------- | ------------ | ---------------- |
