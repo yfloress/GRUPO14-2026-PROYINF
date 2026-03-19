@@ -1,10 +1,14 @@
 # GRUPO02-2025-PROYINF
 
-* Alvaro Aceituno - 202273520-1
-* Diego Marin - 202273607-0
-* Matias Guajardo - 202373549-3
-* Vicente Galaz - 202273554-6
-* **Tutor**: Felipe Ignacio Fernández Aguilar
+| Nombre          | Nickname     | Rol              |
+| --------------- | ------------ | ---------------- |
+| Diego Marin     |  DiegoMarinRojas    |  202273607-0     |
+| (nombre)        |  Lamemble           |  (rol)           |
+| (nombre)        |  PrintExponent68    |  (rol)           |
+| (nombre)        |  elsopaipilla12     |  (rol)           |
+| Yair Flores     |  yfloress           |  202266595-5     |
+
+* **Tutor**: Miguel Huerta
 
 ## Wiki
 
