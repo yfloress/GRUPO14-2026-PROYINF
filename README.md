@@ -5,7 +5,7 @@
 | Diego Marin     |  DiegoMarinRojas    |  202273607-0     |
 | (nombre)        |  Lamemble           |  (rol)           |
 | (nombre)        |  PrintExponent68    |  (rol)           |
-| (nombre)        |  elsopaipilla12     |  (rol)           |
+| Nicolás Muñoz   |  elsopaipilla12     |  202273641-0     |
 | Yair Flores     |  yfloress           |  202266595-5     |
 
 * **Tutor**: Miguel Huerta
