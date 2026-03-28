@@ -3,7 +3,7 @@
 | Nombre          | Nickname     | Rol              |
 | --------------- | ------------ | ---------------- |
 | Diego Marin     |  DiegoMarinRojas    |  202273607-0     |
-| (nombre)        |  Lamemble           |  (rol)           |
+| Cristóbal Reyes |  Lamemble           |  202373562-0     |
 | Héctor Jerez    |  PrintExponent68    |  202373544-2     |
 | Nicolás Muñoz   |  elsopaipilla12     |  202273641-0     |
 | Yair Flores     |  yfloress           |  202266595-5     |
