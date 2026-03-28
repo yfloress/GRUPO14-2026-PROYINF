@@ -12,7 +12,7 @@
 
 ## Wiki
 
-Puede acceder a la Wiki mediante el siguiente [enlace](https://github.com/AlvaroTuno/GRUPO02-2025-PROYINF/wiki)
+Puede acceder a la Wiki mediante el siguiente [enlace](https://github.com/yfloress/GRUPO14-2026-PROYINF/wiki)
 
 ## Videos
 
