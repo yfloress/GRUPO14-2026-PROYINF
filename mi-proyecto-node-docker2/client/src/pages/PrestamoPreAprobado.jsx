@@ -22,6 +22,16 @@ export default function PrestamoPreaprobado() {
   const [cargandoAceptar, setCargandoAceptar] = useState(false);
   const [cargandoClave, setCargandoClave] = useState(false);
   const [prestamoCreado, setPrestamoCreado] = useState(null);
+  const [rentaInput, setRentaInput] = useState(""); // Input visual inmediato
+  const [renta, setRenta] = useState(""); // Valor debounced para el algoritmo
+
+  // Retraso para que no calcule mientras digita (Debounce)
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setRenta(rentaInput);
+    }, 700);
+    return () => clearTimeout(handler);
+  }, [rentaInput]);
 
   // 🔹 Cuota estimada simple (solo para mostrar)
   const cuotaEstimada =
@@ -210,6 +220,42 @@ export default function PrestamoPreaprobado() {
   };
 
   // ==================================================
+  // LÓGICA HU 1: Filtrado de Préstamo Óptimo
+  // ==================================================
+  let idOfertaOptima = null;
+  if (renta && Number(renta) > 0 && ofertas.length > 0) {
+    const sueldo = Number(renta);
+    const limiteCuota = sueldo * 0.30; 
+
+    let mejorOferta = null;
+    let menorDiferencia = Infinity;
+
+    ofertas.forEach((oferta) => {
+      // 0. Solo recomendamos campañas que estén ACTIVAS
+      if (oferta.estado !== "activa") return;
+
+      // 1. Validamos que la cuota mínima obligatoria (monto / max_cuotas) no exceda la asfixia del 30%
+      const cuotaSeguridad = Number(oferta.monto_maximo) / Number(oferta.max_cuotas);
+      
+      if (cuotaSeguridad <= limiteCuota) {
+        // 2. Calculamos una cuota media realista (promedio de cuotas)
+        const cuotaMedia = Number(oferta.monto_maximo) / ((Number(oferta.min_cuotas) + Number(oferta.max_cuotas)) / 2);
+        
+        // 3. El préstamo "Óptimo" será el que aproveche inteligentemente el 80% de su capacidad segura de pago
+        const capacidadIdeal = limiteCuota * 0.8; 
+        const diferencia = Math.abs(cuotaMedia - capacidadIdeal);
+
+        if (diferencia < menorDiferencia) {
+          menorDiferencia = diferencia;
+          mejorOferta = oferta;
+        }
+      }
+    });
+
+    idOfertaOptima = mejorOferta?.id;
+  }
+
+  // ==================================================
   // Render
   // ==================================================
   return (
@@ -247,21 +293,47 @@ export default function PrestamoPreaprobado() {
               )}
 
               {!cargandoOfertas && !errorOfertas && ofertas.length > 0 && (
-                <div className="table-responsive mb-4">
-                  <table className="table table-hover align-middle">
-                    <thead>
-                      <tr>
-                        <th>Nombre oferta</th>
-                        <th>Monto máximo</th>
-                        <th>Rango de cuotas</th>
-                        <th>Estado</th>
-                        <th></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {ofertas.map((oferta) => (
-                        <tr key={oferta.id}>
-                          <td>{oferta.nombre_oferta}</td>
+                <>
+                  <div className="card mb-4 border-0 shadow-sm" style={{backgroundColor: "rgba(13, 110, 253, 0.05)"}}>
+                    <div className="card-body">
+                      <h5 className="mb-2 text-primary"><i className="bi bi-lightbulb-fill me-2"></i>Descubre tu préstamo óptimo</h5>
+                      <p className="text-muted small mb-3">
+                        Ingresa tu sueldo líquido mensual. El sistema aplicará la regla bancaria del máx. 30% de carga financiera y un algoritmo de <strong>optimización de capacidad</strong> para buscar la oferta que mejor se adapte a tu bolsillo sin arriesgar tu estabilidad.
+                      </p>
+                      <div className="input-group shadow-sm" style={{maxWidth: "350px"}}>
+                        <span className="input-group-text bg-white border-end-0">$</span>
+                        <input type="number" className="form-control border-start-0" placeholder="Ej: 800000" value={rentaInput} onChange={e => setRentaInput(e.target.value)} />
+                      </div>
+                      
+                      {renta && Number(renta) > 0 && !idOfertaOptima && ofertas.length > 0 && (
+                        <div className="mt-3 text-danger small fw-semibold">
+                          <i className="bi bi-exclamation-triangle-fill me-1"></i>
+                          Tu ingreso es muy bajo para las cuotas de estas ofertas. Por riesgo financiero, no se recomienda tomar ninguna.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="table-responsive mb-4 shadow-sm rounded">
+                    <table className="table table-hover align-middle mb-0 bg-white">
+                      <thead className="table-light">
+                        <tr>
+                          <th>Nombre oferta</th>
+                          <th>Monto máximo</th>
+                          <th>Rango de cuotas</th>
+                          <th>Estado</th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {ofertas.map((oferta) => (
+                          <tr key={oferta.id} className={idOfertaOptima === oferta.id ? "table-success" : ""}>
+                            <td>
+                              {oferta.nombre_oferta}
+                              {idOfertaOptima === oferta.id && (
+                                <span className="badge bg-success ms-2 shadow-sm rounded-pill"><i className="bi bi-star-fill text-warning me-1"></i>Recomendado</span>
+                              )}
+                            </td>
                           <td>
                             $
                             {Number(
@@ -299,6 +371,7 @@ export default function PrestamoPreaprobado() {
                     </tbody>
                   </table>
                 </div>
+                </>
               )}
             </>
           )}
@@ -520,9 +593,6 @@ export default function PrestamoPreaprobado() {
         </>
       )}
 
-      <p className="mt-5 text-center text-muted" style={{ fontSize: "0.9rem" }}>
-        © 2025 - Mi Proyecto Full Stack
-      </p>
     </div>
   );
 }

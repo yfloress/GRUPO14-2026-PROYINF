@@ -59,9 +59,10 @@ docker compose down -v
 ```
 
 Y si no funciona el comando anterior, pueden usar `Ctrl+C`.
+- Si no se ejecuta, asegúrense de estar en la carpeta correcta.  
+- Si trabajan desde Windows, deben tener instalado WSL2 y tenerlo activado en Docker Desktop.
 
-Si no se ejecuta, asegúrense de estar en la carpeta correcta.  
-Si trabajan desde Windows, deben tener instalado WSL2 y tenerlo activado en Docker Desktop.  
+3. Ingresar a [localhost:3001](http://localhost:3001/login)
 
 Por último, adentro de la carpeta del proyecto hay un README explicando todas las funcionalidades y cómo crear las tablas para la base de datos.
 > **Tip:** Para inicializar rápidamente las tablas de la base de datos con Docker (desde la raíz), se puede ejecutar esto:

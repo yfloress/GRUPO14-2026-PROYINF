@@ -4,20 +4,15 @@ import { useNavigate } from "react-router-dom";
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const navigate = useNavigate();
-
-  // Restaurar sesión si existe
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (e) {
-        console.error("Error cargando usuario guardado:", e);
-      }
+  const [user, setUser] = useState(() => {
+    try {
+      const storedUser = localStorage.getItem("user");
+      return storedUser ? JSON.parse(storedUser) : null;
+    } catch (e) {
+      console.error("Error cargando usuario guardado:", e);
+      return null;
     }
-  }, []);
+  });
 
   /**
    * login(rut, role)

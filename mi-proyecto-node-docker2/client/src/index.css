@@ -11,3 +11,54 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* =========================================
+   Glassmorphism Navbar
+   ========================================= */
+.navbar-glass {
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.navbar-glass .navbar-brand {
+  color: #1a1a1a !important;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.navbar-glass .nav-link {
+  color: #4a4a4a !important;
+  font-weight: 500;
+  margin: 0 8px;
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.navbar-glass .nav-link:hover {
+  color: #0d6efd !important;
+}
+
+/* Subrayado animado en hover */
+.navbar-glass .nav-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 50%;
+  background-color: #0d6efd;
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.navbar-glass .nav-link:hover::after {
+  width: 100%;
+}
+
+.navbar-glass .navbar-toggler-icon {
+  filter: invert(1);
+}
