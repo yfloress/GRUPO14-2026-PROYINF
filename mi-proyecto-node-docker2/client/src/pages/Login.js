@@ -96,8 +96,18 @@ export default function Login() {
             Iniciar Sesión
           </button>
 
-          {/* 🔹 EXTRA BUTTONS */}
+          {/* 🔹 OTRAS ACCIONES */}
           <div className="d-flex flex-column gap-2 mt-3">
+            {/* 🔴 LOGIN ADMIN */}
+            <button
+              type="button"
+              className="btn btn-outline-dark w-100"
+              onClick={loginAdmin}
+            >
+              Ingreso Admin
+            </button>
+
+            {/* BOTONES FAQ / SIMULACIÓN */}
             <div className="d-flex gap-2">
               <button
                 type="button"
@@ -115,15 +125,6 @@ export default function Login() {
                 FAQ
               </button>
             </div>
-
-            {/* 🔴 LOGIN ADMIN */}
-            <button
-              type="button"
-              className="btn btn-outline-dark w-100"
-              onClick={loginAdmin}
-            >
-              Administrador
-            </button>
           </div>
         </form>
 

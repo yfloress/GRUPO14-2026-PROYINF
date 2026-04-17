@@ -6,10 +6,10 @@ npm-debug.log*
 yarn-debug.log*
 
 # Entorno y Secretos (CRÍTICO)
-**/.env
-**/.env.*
-.env
-*.env
+# **/.env
+# **/.env.*
+# .env
+# *.env
 
 # Build y Temporales
 **/dist/

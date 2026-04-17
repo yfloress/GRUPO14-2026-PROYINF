@@ -16,7 +16,7 @@ Puede acceder a la Wiki mediante el siguiente [enlace](https://github.com/yflore
 
 ## Videos
 
-* [Video presentación cliente (Esta alojado en Aula)](https://aula.usm.cl/mod/resource/view.php?id=6926137)
+* [Video presentación cliente (Está alojado en Aula)](https://aula.usm.cl/mod/resource/view.php?id=6926137)
 * [Video de avances del proyecto (Hito 3)](https://youtu.be/zVKJSRhsQBA)
 * [Segunda Reunión con el cliente 05-11-2025](https://drive.google.com/file/d/1X_r8pDOMemV8-iPtcfFoTjsE5H_7BTZU/view)
 * [Video de resultado final del sistema implementado (Hito 5)](https://youtu.be/Z70Jahmeq90)
@@ -24,53 +24,55 @@ Puede acceder a la Wiki mediante el siguiente [enlace](https://github.com/yflore
 
 ## Aspectos técnicos relevantes
 
-_Todo aspecto relevante cuando para poder usar el proyecto o consideraciones del proyecto base a ser entregado_
-
 Este proyecto usa los siguientes stack de desarrollo:
 
 * Front-end: React
 * Back-end: Node.js
 * Base de datos: PostgreSQL
-### Instalación Del Proyecto
+### Instalación del Proyecto
 #### Requisitos Previos
 * [Docker](https://docs.docker.com/get-docker/)
 * [Docker Compose](https://docs.docker.com/compose/install/) (v2.0+)
 * [Node.js](https://nodejs.org/) (opcional, solo para desarrollo local)
 * `curl` o cliente HTTP (para probar endpoints)
+* (Opcional) [Podman](https://podman.io/) y [Podman Compose](https://github.com/containers/podman-compose)
+
 #### Clonar el repositorio
 ```bash
-git clone https://github.com/AlvaroTuno/GRUPO02-2025-PROYINF
+git clone https://github.com/yfloress/GRUPO14-2026-PROYINF
 ```
 
-(debe tener docker-desktop abierto en todo momento)
+(Debe tener Docker Desktop abierto en todo momento si se usa Docker. Si se usa Podman no es necesario, y simplemente ejecute los comandos usando podman en vez de docker.)
 
 Ejecutar en terminal:
 
-1. Deben navegar hasta la carpeta `GRUPO02-2025-PROYINF/mi-proyecto-node-docker2`
+1. Ingrese a la carpeta `GRUPO14-2026-PROYINF/mi-proyecto-node-docker2`
 
-2. (les instalará las dependencias se suele demorar un poco la primera vez con esto levantan el proyecto)  
+2. (Esto instalará las dependencias y suele demorar un poco la primera vez; con esto levantan el proyecto):  
 ```bash
 docker compose up --build
 ```
 
-(para detener los contenedores)
+(Para detener los contenedores)
 ```bash
 docker compose down -v
 ```
 
-y si no funciona el anterior pueden usar `Ctrl+C`.
+Y si no funciona el comando anterior, pueden usar `Ctrl+C`.
 
-si no les ejecuta asegurense de estar en la carpeta correcta  
-si trabajan desde Windows deben tener instalado WSL2 y tenerlo activado en docker desktop  
-esto se puede verificar en  
+Si no se ejecuta, asegúrense de estar en la carpeta correcta.  
+Si trabajan desde Windows, deben tener instalado WSL2 y tenerlo activado en Docker Desktop.  
 
-Por ultimo adentro de la carpeta del proyecto esta un readme explicando todas las funcionalidades y como crear las tablas para la base de datos
+Por último, adentro de la carpeta del proyecto hay un README explicando todas las funcionalidades y cómo crear las tablas para la base de datos.
+> **Tip:** Para inicializar rápidamente las tablas de la base de datos con Docker (desde la raíz), se puede ejecutar esto:
+> ```bash
+> awk 'NR>=98 && NR<=288' mi-proyecto-node-docker2/README.md | docker exec -i postgres_db psql -U postgres -d prestamos_db
+> ```
 
 Configuración   
 
 Resources  
 
-  * Configure which WSL 2 distros you want to access Docker from. (esto debe estar activo)  
-  * Enable integration with additional distros:(esto debe estar activo)
-
+  * Configure which WSL 2 distros you want to access Docker from (esto debe estar activo).  
+  * Enable integration with additional distros (esto debe estar activo).
 

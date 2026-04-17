@@ -99,11 +99,7 @@ function App() {
             />
             <Route
               path="/evaluacion-riesgo"
-              element={
-                <ProtectedRoute>
-                  <EvaluacionRiesgo />
-                </ProtectedRoute>
-              }
+              element={<EvaluacionRiesgo />}
             />
             <Route
               path="/prestamo-preaprobado"
@@ -166,14 +162,10 @@ function App() {
 
             <Route
               path="/faq"
-              element={
-                <ProtectedRoute>
-                  <FAQ />
-                </ProtectedRoute>
-              }
+              element={<FAQ />}
             />
 
-            {/* 🔐 Seguridad de cuenta (SIN ProtectedRoute) */}
+            {/* Seguridad de cuenta (SIN ProtectedRoute) */}
             <Route path="/seguridad" element={<SeguridadCuenta />} />
             {/* Soportamos también /seguridad-cuenta por si algún botón apunta ahí */}
             <Route path="/seguridad-cuenta" element={<SeguridadCuenta />} />
