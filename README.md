@@ -70,6 +70,26 @@ Por último, adentro de la carpeta del proyecto hay un README explicando todas l
 > awk 'NR>=98 && NR<=288' mi-proyecto-node-docker2/README.md | docker exec -i postgres_db psql -U postgres -d prestamos_db
 > ```
 
+Tabla BDD
+
+-- =====================================================
+-- DATOS MANUALES DEL CLIENTE
+-- =====================================================
+CREATE TABLE IF NOT EXISTS datos_cliente (
+  id SERIAL PRIMARY KEY,
+  rut_cliente VARCHAR(20) NOT NULL UNIQUE,
+  renta_mensual NUMERIC(12,2) NOT NULL,
+  antiguedad_empresa_meses INT NOT NULL,
+  condicion_laboral VARCHAR(50) NOT NULL,
+  tipo_contrato VARCHAR(50) NOT NULL,
+  deuda_mensual NUMERIC(12,2) DEFAULT 0,
+  integrantes_hogar INT DEFAULT 1,
+  fecha_actualizacion TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_datos_cliente_rut
+  ON datos_cliente (rut_cliente);
+
 Configuración   
 
 Resources  

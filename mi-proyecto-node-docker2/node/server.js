@@ -156,6 +156,177 @@ app.get("/api/prestamos", async (req, res) => {
   }
 });
 
+// ----------------------------------------------------
+// 🔹 Datos manuales del cliente para solicitud de préstamo
+// ----------------------------------------------------
+const DIAS_VIGENCIA_DATOS_CLIENTE = 30;
+
+app.get("/api/datos-cliente/:rut/estado", async (req, res) => {
+  try {
+    const { rut } = req.params;
+
+    if (!rut) {
+      return res.status(400).json({
+        ok: false,
+        requiere_actualizacion: true,
+        motivo: "Falta el RUT del cliente.",
+      });
+    }
+
+    const result = await pool.query(
+      `
+      SELECT *
+      FROM datos_cliente
+      WHERE rut_cliente = $1
+      `,
+      [rut]
+    );
+
+    if (result.rows.length === 0) {
+      return res.json({
+        ok: true,
+        requiere_actualizacion: true,
+        motivo: "No existen datos financieros registrados.",
+        datos: null,
+      });
+    }
+
+    const datos = result.rows[0];
+
+    const fechaActualizacion = new Date(datos.fecha_actualizacion);
+    const hoy = new Date();
+    const diferenciaMs = hoy - fechaActualizacion;
+    const diasTranscurridos = Math.floor(diferenciaMs / (1000 * 60 * 60 * 24));
+
+    if (diasTranscurridos >= DIAS_VIGENCIA_DATOS_CLIENTE) {
+      return res.json({
+        ok: true,
+        requiere_actualizacion: true,
+        motivo: `Los datos financieros tienen ${diasTranscurridos} días y deben actualizarse cada ${DIAS_VIGENCIA_DATOS_CLIENTE} días.`,
+        datos,
+      });
+    }
+
+    return res.json({
+      ok: true,
+      requiere_actualizacion: false,
+      motivo: "Los datos financieros están vigentes.",
+      dias_transcurridos: diasTranscurridos,
+      datos,
+    });
+  } catch (error) {
+    console.error("❌ Error al consultar estado de datos del cliente:", error);
+    res.status(500).json({
+      ok: false,
+      requiere_actualizacion: true,
+      error: "Error interno al consultar datos del cliente.",
+    });
+  }
+});
+
+app.post("/api/datos-cliente", async (req, res) => {
+  try {
+    const {
+      rut_cliente,
+      renta_mensual,
+      antiguedad_empresa_meses,
+      condicion_laboral,
+      tipo_contrato,
+      deuda_mensual,
+      integrantes_hogar,
+    } = req.body;
+
+    if (
+      !rut_cliente ||
+      !renta_mensual ||
+      antiguedad_empresa_meses === undefined ||
+      !condicion_laboral ||
+      !tipo_contrato
+    ) {
+      return res.status(400).json({
+        ok: false,
+        error:
+          "Faltan datos obligatorios: rut_cliente, renta_mensual, antiguedad_empresa_meses, condicion_laboral o tipo_contrato.",
+      });
+    }
+
+    if (Number(renta_mensual) <= 0) {
+      return res.status(400).json({
+        ok: false,
+        error: "La renta mensual debe ser mayor a 0.",
+      });
+    }
+
+    if (Number(antiguedad_empresa_meses) < 0) {
+      return res.status(400).json({
+        ok: false,
+        error: "La antigüedad no puede ser negativa.",
+      });
+    }
+
+    if (Number(deuda_mensual || 0) < 0) {
+      return res.status(400).json({
+        ok: false,
+        error: "La deuda mensual no puede ser negativa.",
+      });
+    }
+
+    if (Number(integrantes_hogar || 1) <= 0) {
+      return res.status(400).json({
+        ok: false,
+        error: "Los integrantes del hogar deben ser al menos 1.",
+      });
+    }
+
+    const result = await pool.query(
+      `
+      INSERT INTO datos_cliente (
+        rut_cliente,
+        renta_mensual,
+        antiguedad_empresa_meses,
+        condicion_laboral,
+        tipo_contrato,
+        deuda_mensual,
+        integrantes_hogar,
+        fecha_actualizacion
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
+      ON CONFLICT (rut_cliente)
+      DO UPDATE SET
+        renta_mensual = EXCLUDED.renta_mensual,
+        antiguedad_empresa_meses = EXCLUDED.antiguedad_empresa_meses,
+        condicion_laboral = EXCLUDED.condicion_laboral,
+        tipo_contrato = EXCLUDED.tipo_contrato,
+        deuda_mensual = EXCLUDED.deuda_mensual,
+        integrantes_hogar = EXCLUDED.integrantes_hogar,
+        fecha_actualizacion = NOW()
+      RETURNING *;
+      `,
+      [
+        rut_cliente,
+        renta_mensual,
+        antiguedad_empresa_meses,
+        condicion_laboral,
+        tipo_contrato,
+        deuda_mensual || 0,
+        integrantes_hogar || 1,
+      ]
+    );
+
+    res.json({
+      ok: true,
+      message: "Datos financieros actualizados correctamente.",
+      datos: result.rows[0],
+    });
+  } catch (error) {
+    console.error("❌ Error al guardar datos del cliente:", error);
+    res.status(500).json({
+      ok: false,
+      error: "Error interno al guardar datos financieros del cliente.",
+    });
+  }
+});
+
 // ---------------------------
 // 🔹 Login y Registro
 // ---------------------------

@@ -1,5 +1,5 @@
 // client/src/pages/SolicitudPrestamo.js
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
 export default function SolicitudPrestamo() {
@@ -7,6 +7,19 @@ export default function SolicitudPrestamo() {
   const [monto, setMonto] = useState(0);
   const [cuotas, setCuotas] = useState(2);
   const [loading, setLoading] = useState(false);
+  const [verificandoDatos, setVerificandoDatos] = useState(true);
+  const [requiereActualizacion, setRequiereActualizacion] = useState(false);
+  const [motivoActualizacion, setMotivoActualizacion] = useState("");
+  const [guardandoDatos, setGuardandoDatos] = useState(false);
+
+  const [datosCliente, setDatosCliente] = useState({
+    renta_mensual: "",
+    antiguedad_empresa_meses: "",
+    condicion_laboral: "dependiente",
+    tipo_contrato: "indefinido",
+    deuda_mensual: "",
+    integrantes_hogar: 1,
+  });
 
   const [historial, setHistorial] = useState([]);
 
@@ -14,6 +27,117 @@ export default function SolicitudPrestamo() {
 
   const interesTotal = monto * interesFijo;
   const cuotaMensual = cuotas > 0 ? (monto + interesTotal) / cuotas : 0;
+
+  const cargarEstadoDatosCliente = async () => {
+  if (!user?.rut) {
+    setVerificandoDatos(false);
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `http://localhost:3000/api/datos-cliente/${encodeURIComponent(
+        user.rut
+      )}/estado`
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Error al verificar datos del cliente.");
+    }
+
+    setRequiereActualizacion(result.requiere_actualizacion);
+    setMotivoActualizacion(result.motivo || "");
+
+    if (result.datos) {
+      setDatosCliente({
+        renta_mensual: result.datos.renta_mensual || "",
+        antiguedad_empresa_meses:
+          result.datos.antiguedad_empresa_meses || "",
+        condicion_laboral: result.datos.condicion_laboral || "dependiente",
+        tipo_contrato: result.datos.tipo_contrato || "indefinido",
+        deuda_mensual: result.datos.deuda_mensual || "",
+        integrantes_hogar: result.datos.integrantes_hogar || 1,
+      });
+    }
+  } catch (error) {
+    console.error("Error verificando datos del cliente:", error);
+    setRequiereActualizacion(true);
+    setMotivoActualizacion(
+      "No se pudo verificar la vigencia de tus datos. Debes actualizarlos antes de continuar."
+    );
+  } finally {
+    setVerificandoDatos(false);
+  }
+};
+
+useEffect(() => {
+  cargarEstadoDatosCliente();
+}, [user?.rut]);
+
+const handleChangeDatosCliente = (e) => {
+  const { name, value } = e.target;
+
+  setDatosCliente((prev) => ({
+    ...prev,
+    [name]: value,
+  }));
+};
+
+const guardarDatosCliente = async (e) => {
+  e.preventDefault();
+
+  if (!user?.rut) {
+    alert("Debes iniciar sesión para actualizar tus datos.");
+    return;
+  }
+
+  if (
+    Number(datosCliente.renta_mensual) <= 0 ||
+    Number(datosCliente.antiguedad_empresa_meses) < 0 ||
+    Number(datosCliente.deuda_mensual || 0) < 0 ||
+    Number(datosCliente.integrantes_hogar || 1) <= 0
+  ) {
+    alert("Revisa los datos ingresados. Hay valores inválidos.");
+    return;
+  }
+
+  setGuardandoDatos(true);
+
+  try {
+    const response = await fetch("http://localhost:3000/api/datos-cliente", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        rut_cliente: user.rut,
+        renta_mensual: Number(datosCliente.renta_mensual),
+        antiguedad_empresa_meses: Number(
+          datosCliente.antiguedad_empresa_meses
+        ),
+        condicion_laboral: datosCliente.condicion_laboral,
+        tipo_contrato: datosCliente.tipo_contrato,
+        deuda_mensual: Number(datosCliente.deuda_mensual || 0),
+        integrantes_hogar: Number(datosCliente.integrantes_hogar || 1),
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Error al guardar datos del cliente.");
+    }
+
+    alert("Datos financieros actualizados correctamente.");
+    setRequiereActualizacion(false);
+    setMotivoActualizacion("");
+  } catch (error) {
+    console.error("Error guardando datos del cliente:", error);
+    alert(error.message || "No se pudieron guardar los datos.");
+  } finally {
+    setGuardandoDatos(false);
+  }
+};
 
   const guardarSimulacion = () => {
     if (monto <= 0 || cuotas <= 0) {
@@ -43,6 +167,11 @@ export default function SolicitudPrestamo() {
     if (!user?.rut) {
       alert("Debes iniciar sesión para solicitar un préstamo.");
       return;
+    }
+
+    if (requiereActualizacion) {
+    alert("Debes actualizar tus datos financieros antes de solicitar un préstamo.");
+    return;
     }
 
     setLoading(true);
@@ -86,7 +215,7 @@ export default function SolicitudPrestamo() {
 
 
       let mensaje =
-        "✅ Préstamo registrado correctamente.\n\n" +
+        "Préstamo registrado correctamente.\n\n" +
         `RUT cliente: ${prestamo?.rut_cliente}\n` +
         `Monto: $${Math.round(prestamo?.monto || monto).toLocaleString("es-CL")}\n` +
         `Cuotas generadas: ${cuotasGeneradas?.length || cuotas}\n` +
@@ -102,7 +231,7 @@ export default function SolicitudPrestamo() {
 
       console.log("Resultado completo:", result);
     } catch (error) {
-      console.error("❌ Error:", error);
+      console.error(" Error:", error);
       alert("Ocurrió un error al registrar el préstamo. Intenta nuevamente.");
     } finally {
       setLoading(false);
@@ -113,6 +242,159 @@ export default function SolicitudPrestamo() {
     <div style={{ textAlign: "center", marginTop: "60px" }}>
       <h1>Solicitud de Préstamo</h1>
       <p>Completa los datos para generar tu solicitud y ver el plan de pagos.</p>
+
+      {verificandoDatos && (
+  <div
+    style={{
+      width: "80%",
+      margin: "30px auto",
+      padding: "20px",
+      border: "1px solid #ccc",
+      borderRadius: "8px",
+      backgroundColor: "#f8f9fa",
+    }}
+  >
+    Verificando vigencia de datos financieros...
+  </div>
+)}
+
+{!verificandoDatos && requiereActualizacion && (
+  <form
+    onSubmit={guardarDatosCliente}
+    style={{
+      width: "80%",
+      margin: "30px auto",
+      padding: "25px",
+      border: "1px solid #ffc107",
+      borderRadius: "8px",
+      backgroundColor: "#fff8e1",
+      textAlign: "left",
+    }}
+  >
+    <h3 style={{ textAlign: "center" }}>Actualización obligatoria de datos</h3>
+
+    <p style={{ textAlign: "center" }}>
+      {motivoActualizacion ||
+        "La institución requiere actualizar tus datos antes de solicitar un préstamo."}
+    </p>
+
+    <div style={{ marginBottom: "15px" }}>
+      <label>Renta mensual:</label>
+      <input
+        type="number"
+        name="renta_mensual"
+        min="1"
+        value={datosCliente.renta_mensual}
+        onChange={handleChangeDatosCliente}
+        required
+        style={{ display: "block", width: "100%", padding: "8px" }}
+      />
+    </div>
+
+    <div style={{ marginBottom: "15px" }}>
+      <label>Antigüedad en empresa actual, en meses:</label>
+      <input
+        type="number"
+        name="antiguedad_empresa_meses"
+        min="0"
+        value={datosCliente.antiguedad_empresa_meses}
+        onChange={handleChangeDatosCliente}
+        required
+        style={{ display: "block", width: "100%", padding: "8px" }}
+      />
+    </div>
+
+    <div style={{ marginBottom: "15px" }}>
+      <label>Condición laboral:</label>
+      <select
+        name="condicion_laboral"
+        value={datosCliente.condicion_laboral}
+        onChange={handleChangeDatosCliente}
+        required
+        style={{ display: "block", width: "100%", padding: "8px" }}
+      >
+        <option value="dependiente">Dependiente</option>
+        <option value="independiente">Independiente</option>
+        <option value="pensionado">Pensionado</option>
+        <option value="cesante">Cesante</option>
+      </select>
+    </div>
+
+    <div style={{ marginBottom: "15px" }}>
+      <label>Tipo de contrato:</label>
+      <select
+        name="tipo_contrato"
+        value={datosCliente.tipo_contrato}
+        onChange={handleChangeDatosCliente}
+        required
+        style={{ display: "block", width: "100%", padding: "8px" }}
+      >
+        <option value="indefinido">Indefinido</option>
+        <option value="plazo_fijo">Plazo fijo</option>
+        <option value="honorarios">Honorarios</option>
+        <option value="sin_contrato">Sin contrato</option>
+      </select>
+    </div>
+
+    <div style={{ marginBottom: "15px" }}>
+      <label>Deuda mensual aproximada:</label>
+      <input
+        type="number"
+        name="deuda_mensual"
+        min="0"
+        value={datosCliente.deuda_mensual}
+        onChange={handleChangeDatosCliente}
+        style={{ display: "block", width: "100%", padding: "8px" }}
+      />
+    </div>
+
+    <div style={{ marginBottom: "15px" }}>
+      <label>Integrantes del hogar:</label>
+      <input
+        type="number"
+        name="integrantes_hogar"
+        min="1"
+        value={datosCliente.integrantes_hogar}
+        onChange={handleChangeDatosCliente}
+        required
+        style={{ display: "block", width: "100%", padding: "8px" }}
+      />
+    </div>
+
+    <button
+      type="submit"
+      disabled={guardandoDatos}
+      style={{
+        display: "block",
+        margin: "20px auto 0",
+        padding: "10px 20px",
+        fontSize: "16px",
+        backgroundColor: guardandoDatos ? "#ccc" : "#007bff",
+        color: "white",
+        border: "none",
+        borderRadius: "8px",
+        cursor: guardandoDatos ? "not-allowed" : "pointer",
+      }}
+    >
+      {guardandoDatos ? "Guardando..." : "Guardar datos y continuar"}
+    </button>
+  </form>
+)}
+
+{!verificandoDatos && !requiereActualizacion && (
+  <div
+    style={{
+      width: "80%",
+      margin: "20px auto",
+      padding: "15px",
+      border: "1px solid #28a745",
+      borderRadius: "8px",
+      backgroundColor: "#e9f7ef",
+    }}
+  >
+     Tus datos financieros están vigentes. Puedes solicitar un préstamo.
+  </div>
+)}
 
       {/* Monto */}
       <div style={{ marginTop: "30px" }}>
@@ -202,9 +484,13 @@ export default function SolicitudPrestamo() {
           borderRadius: "8px",
           cursor: loading ? "not-allowed" : "pointer",
         }}
-        disabled={loading}
+        disabled={loading || verificandoDatos || requiereActualizacion}
       >
-        {loading ? "Enviando..." : "Solicitar"}
+        {loading
+          ? "Enviando..."
+          : requiereActualizacion
+          ? "Actualiza tus datos para continuar"
+          : "Solicitar"}
       </button>
 
       {historial.length > 0 && (
