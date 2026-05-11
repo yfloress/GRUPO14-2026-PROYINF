@@ -67,7 +67,8 @@ Y si no funciona el comando anterior, pueden usar `Ctrl+C`.
 Por último, adentro de la carpeta del proyecto hay un README explicando todas las funcionalidades y cómo crear las tablas para la base de datos.
 > **Tip:** Para inicializar rápidamente las tablas de la base de datos con Docker (desde la raíz), se puede ejecutar esto:
 > ```bash
-> awk 'NR>=98 && NR<=287' mi-proyecto-node-docker2/README.md | docker exec -i postgres_db psql -U postgres -d prestamos_db
+> awk 'NR>=98 && NR<=306' mi-proyecto-node-docker2/README.md | docker exec -i postgres_db psql -U postgres -d prestamos_db
+> ```
 Configuración   
 
 Resources  
