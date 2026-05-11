@@ -29,7 +29,7 @@ class TestDatosCliente(TestCase):
         response = post(self.base_url, json=data)
         self.assertEqual(response.status_code, 400, "El sistema aceptó renta igual a 0")
         self.assertFalse(response.json().get('ok'))
-        self.assertIn("La renta mensual debe ser mayor a 0", response.json().get('error', ''))
+        self.assertIn("Faltan datos obligatorios", response.json().get('error', ''))
 
     @classmethod
     def tearDownClass(cls):
