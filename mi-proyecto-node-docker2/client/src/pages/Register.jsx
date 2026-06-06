@@ -13,6 +13,19 @@ export default function Register() {
     setError("");
     setSuccess("");
 
+  const esRutValido = (rut) => {
+    // revisa que el largo del rut este entre 7 y 8 siendo numerico
+    //permite la k para dig verif tanto en mayus como en min
+    const regex = /^\d{7,8}-[\dkK]$/;
+    return regex.test(rut);
+  };
+
+
+  if (!esRutValido(rut)) {
+        setError("El formato del RUT es inválido.");
+        return; // Detiene la ejecución antes del fetch
+  }
+
     try {
       const res = await fetch("http://localhost:3000/api/usuarios/registro", {
         method: "POST",

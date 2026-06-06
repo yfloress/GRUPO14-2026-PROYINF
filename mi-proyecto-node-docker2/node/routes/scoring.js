@@ -36,6 +36,24 @@ router.post("/", async (req, res) => {
       motivo,
     } = req.body;
 
+    if (!rut) {
+      return res.status(500).json({ 
+        ok: false, 
+        error: "Error interno: El RUT es un campo obligatorio y no puede ser nulo." 
+      });
+    }
+
+    // formato con Regex largo 7-8, guion, y dig verif + k
+    const rutRegex = /^[0-9]{7,8}-[0-9Kk]$/; 
+    
+    if (!rutRegex.test(rut)) {
+      return res.status(400).json({ 
+        ok: false, 
+        error: "Estructura de petición incorrecta: El formato del RUT es inválido (ej: 12345678-9)." 
+      });
+    }
+
+
     // ✅ Ejecutar el INSERT con todos los campos
     const result = await pool.query(
       `INSERT INTO scoring_evaluaciones (
