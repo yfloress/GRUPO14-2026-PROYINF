@@ -26,10 +26,9 @@ El parámetro `session_id` es obtenido directamente desde `req.query` (dato ingr
 Se validará y sanitizará el parámetro `session_id` antes de usarlo, verificando que cumpla con el formato esperado antes de construir cualquier URL.
 
 ### Corrección aplicada
-En `node/routes/floid.js`, se agregó validación del parámetro `session_id` recibido desde `req.query`:
-- Se verifica que no sea nulo o vacío
-- Se verifica que sea de tipo string
-- Si no cumple, se retorna error 400 antes de que el dato llegue a la función que construye la URL
+Doble capa de protección:
+1. **En `node/routes/floid.js`**: validación temprana del `session_id` desde `req.query` (nulo, vacío o tipo incorrecto → error 400)
+2. **En `node/apis/reales/floid.js`**: validación de formato alfanumérico y sanitización con `encodeURIComponent()` antes de insertar en la URL, con throw de error si el formato es inválido
 
 ---
 
@@ -64,3 +63,19 @@ En `node/index.js`, se cambió `app.use(cors())` por `app.use(cors({ origin: ["h
 | Corregir vulnerabilidades SSRF en rutas | Sí | Riesgo de seguridad alto |
 | Restringir configuración CORS | Sí | Riesgo de seguridad alto |
 | Correcciones de mantenibilidad (Code Smells) | No en este hito | Son de severidad baja y no afectan funcionalidad |
+
+---
+
+## Re-inspección
+
+Luego de aplicar las correcciones y ejecutar un nuevo análisis en SonarQube Cloud, se verificó que ambos issues fueron resueltos satisfactoriamente:
+
+| Issue | Archivo | Estado anterior | Estado posterior |
+|---|---|---|---|
+| URL desde datos del usuario | `node/apis/reales/floid.js:30` | Open (Major) | **Resuelto** |
+| CORS inseguro | `node/index.js:8` | Open (Major) | **Resuelto** |
+
+El total de issues del proyecto se redujo de **97 a 95**, confirmando la eliminación de ambos issues.
+
+### Screenshots de re-inspección
+![Re-inspección Issue 1 y 2](./Re-Inspection.png)
