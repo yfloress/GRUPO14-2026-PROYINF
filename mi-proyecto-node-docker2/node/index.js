@@ -5,7 +5,7 @@ import cors from "cors";
 
 dotenv.config();
 const app = express();
-app.use(cors());
+app.use(cors({ origin: ["http://localhost:3001", "http://frontend:3000"] }));
 app.use(express.json());
 
 //  Detectar si estamos en modo test

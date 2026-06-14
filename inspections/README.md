@@ -10,7 +10,7 @@ Se identificaron 97 issues en total. A continuación se documentan 2 issues de s
 
 | Campo | Detalle |
 |---|---|
-| **Archivo** | `node/routes/floid.js` |
+| **Archivo** | `node/apis/reales/floid.js` |
 | **Línea** | L30 |
 | **Tipo** | Vulnerability |
 | **Severidad** | Major |
@@ -24,6 +24,12 @@ El parámetro `session_id` es obtenido directamente desde `req.query` (dato ingr
 
 ### Cómo se abordará
 Se validará y sanitizará el parámetro `session_id` antes de usarlo, verificando que cumpla con el formato esperado antes de construir cualquier URL.
+
+### Corrección aplicada
+En `node/routes/floid.js`, se agregó validación del parámetro `session_id` recibido desde `req.query`:
+- Se verifica que no sea nulo o vacío
+- Se verifica que sea de tipo string
+- Si no cumple, se retorna error 400 antes de que el dato llegue a la función que construye la URL
 
 ---
 
@@ -45,6 +51,9 @@ La política CORS no está restringida a orígenes de confianza, lo que permite 
 
 ### Cómo se abordará
 Se configurará CORS especificando explícitamente los orígenes permitidos (dominio del frontend) en lugar de permitir todos los orígenes con `*`.
+
+### Corrección aplicada
+En `node/index.js`, se cambió `app.use(cors())` por `app.use(cors({ origin: ["http://localhost:3001", "http://frontend:3000"] }))`, restringiendo las peticiones CORS únicamente a los orígenes del frontend.
 
 ---
 

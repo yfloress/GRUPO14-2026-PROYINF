@@ -25,6 +25,11 @@ router.post("/iniciar", async (req, res) => {
 router.get("/callback", async (req, res) => {
   try {
     const { session_id } = req.query;
+
+    if (!session_id || typeof session_id !== "string" || session_id.trim().length === 0) {
+      return res.status(400).json({ error: "Parámetro session_id inválido o faltante" });
+    }
+
     const cuentas = await obtenerDatosFinancieros(session_id);
     res.json(cuentas);
   } catch (error) {
