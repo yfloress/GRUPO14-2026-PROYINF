@@ -1,0 +1,11 @@
+Prueba 1:
+Se podrian simular unos 300 usuarios tratando de visualizar su estado de cuenta en un plazo de 30 segundos, esto con la finalidad de ver si la pagina se cae o sufre retrasos. (HU002)
+(Podria ocurrir en un fin de mes cuando la gente suele pagar sus deudas)
+
+Prueba 2:
+Se podria simular unos 150 usuarios solicitando aceptar un prestamo optimo en un margen de 15 segundos. (HU012)
+(Aunque es poco probable que pase en un dia cualquiera podria ocurrir en festividades)
+
+Prueba 3:
+Se podria simular unos 150 usuarios enviando sus datos para que el sistema calcule el riesgo de dicho cliente. (HU003)
+(Se podrian dar multiples solicitudes simultaneas, sobretodo en festividades)
