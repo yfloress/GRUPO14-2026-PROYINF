@@ -1,0 +1,6 @@
+La prueba llevada a cabo fue la 3, "Se podria simular unos 150 usuarios enviando sus datos para que el sistema calcule el riesgo de dicho cliente. (HU003)"
+esto fue sobre el endpoint de scoring, para esta prueba, simulamos un escenario de alta demanda donde 150 clientes ingresan a la plataforma de forma progresiva a lo largo de 30 segundos
+se probo de esta manera para ver como se comportaba el sistema en una situacion de alta demanda en pequeños plazos.
+
+
+Se logró el resultado esperado. El gráfico de Response Time demuestra que, tras un tiempo inicial de estabilización, el sistema mantuvo latencias extremadamente bajas, menores a 1seg.
